@@ -9,5 +9,8 @@ func main()  {
 	block := blockChain.NewBlock("test block", []byte{})
 
 	fmt.Println(block)
+	fmt.Println(block)
+	fmt.Println(block)
+	fmt.Println(block)
 }
 
