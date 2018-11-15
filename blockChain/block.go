@@ -1,10 +1,10 @@
 package blockChain
 
 import (
-	"time"
-	"encoding/binary"
 	"bytes"
 	"crypto/sha256"
+	"encoding/binary"
+	"time"
 )
 
 type Block struct {
@@ -39,12 +39,19 @@ func NewBlock(data string, prevHash []byte) *Block {
 		Data:       []byte(data),
 	}
 
-	block.SetHash()
+	//block.SetHash()
+
+	pow := NewProofOfWork(&block)
+	blockHash, nonce := pow.RunPow()
+	block.Hash = blockHash
+	block.Nonce = nonce
+
 	return &block
+
 }
 
 //uint64转[]byte
-func Uint64ToBytes(num uint64) []byte  {
+func Uint64ToBytes(num uint64) []byte {
 	buf := bytes.NewBuffer([]byte{})
 	err := binary.Write(buf, binary.BigEndian, num)
 	if err != nil {
@@ -53,7 +60,7 @@ func Uint64ToBytes(num uint64) []byte  {
 	return buf.Bytes()
 }
 
-func (block *Block)SetHash()  {
+func (block *Block) SetHash() {
 	tmp := [][]byte{
 		Uint64ToBytes(block.Version),
 		block.PrevHash,
