@@ -5,6 +5,8 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"time"
+	"encoding/gob"
+	"log"
 )
 
 type Block struct {
@@ -74,4 +76,32 @@ func (block *Block) SetHash() {
 
 	blockHash := sha256.Sum256(blockInfo)
 	block.Hash = blockHash[:]
+}
+
+//序列化
+func (block *Block)serialization() []byte {
+
+	//
+	var buffer bytes.Buffer
+	encoder := gob.NewEncoder(&buffer)
+	err := encoder.Encode(&block)
+	if err != nil {
+		log.Panic("block serialization err")
+	}
+
+	return buffer.Bytes()
+}
+
+func Deserialization(data []byte) Block  {
+
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+
+	var block Block
+	err := decoder.Decode(&block)
+	if err != nil {
+		log.Panic("data deserialization to block err")
+	}
+
+	return block
+
 }
