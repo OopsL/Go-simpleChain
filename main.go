@@ -2,15 +2,12 @@ package main
 
 import "simpleChain/blockChain"
 
-func main()  {
+func main() {
 
-	bc := blockChain.NewBlockChain()
+	bc := blockChain.NewBlockChain("中本聪")
 
-	cli := CLI{bc:bc}
+	cli := CLI{bc: bc}
 	cli.Run()
-
-
-	AAA()
 
 	//bc.AddBlock("这是第二个block")
 	//bc.AddBlock("这是第三个block")
@@ -31,4 +28,3 @@ func main()  {
 	//}
 
 }
-

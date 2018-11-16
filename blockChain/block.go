@@ -2,11 +2,10 @@ package blockChain
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/binary"
-	"time"
 	"encoding/gob"
 	"log"
+	"time"
 )
 
 type Block struct {
@@ -26,10 +25,11 @@ type Block struct {
 	//当前区块哈希
 	Hash []byte
 	//数据
-	Data []byte
+	//Data []byte
+	Transactions []*Transaction
 }
 
-func NewBlock(data string, prevHash []byte) *Block {
+func NewBlock(txs []*Transaction, prevHash []byte) *Block {
 	block := Block{
 		Version:    00,
 		PrevHash:   prevHash,
@@ -38,8 +38,11 @@ func NewBlock(data string, prevHash []byte) *Block {
 		Difficulty: 0,
 		Nonce:      0,
 		Hash:       []byte{},
-		Data:       []byte(data),
+		//Data:       []byte(data),
+		Transactions: txs,
 	}
+
+	block.MerkelRoot = block.MakeMerkelRoot()
 
 	//block.SetHash()
 
@@ -52,6 +55,11 @@ func NewBlock(data string, prevHash []byte) *Block {
 
 }
 
+func (block *Block) MakeMerkelRoot() []byte {
+	//TODO
+	return []byte{}
+}
+
 //uint64转[]byte
 func Uint64ToBytes(num uint64) []byte {
 	buf := bytes.NewBuffer([]byte{})
@@ -62,24 +70,24 @@ func Uint64ToBytes(num uint64) []byte {
 	return buf.Bytes()
 }
 
-func (block *Block) SetHash() {
-	tmp := [][]byte{
-		Uint64ToBytes(block.Version),
-		block.PrevHash,
-		block.MerkelRoot,
-		Uint64ToBytes(block.TimeStamp),
-		Uint64ToBytes(block.Difficulty),
-		Uint64ToBytes(block.Nonce),
-		block.Data,
-	}
-	blockInfo := bytes.Join(tmp, []byte{})
-
-	blockHash := sha256.Sum256(blockInfo)
-	block.Hash = blockHash[:]
-}
+//func (block *Block) SetHash() {
+//	tmp := [][]byte{
+//		Uint64ToBytes(block.Version),
+//		block.PrevHash,
+//		block.MerkelRoot,
+//		Uint64ToBytes(block.TimeStamp),
+//		Uint64ToBytes(block.Difficulty),
+//		Uint64ToBytes(block.Nonce),
+//		block.Data,
+//	}
+//	blockInfo := bytes.Join(tmp, []byte{})
+//
+//	blockHash := sha256.Sum256(blockInfo)
+//	block.Hash = blockHash[:]
+//}
 
 //序列化
-func (block *Block)serialization() []byte {
+func (block *Block) serialization() []byte {
 
 	//
 	var buffer bytes.Buffer
@@ -92,7 +100,7 @@ func (block *Block)serialization() []byte {
 	return buffer.Bytes()
 }
 
-func Deserialization(data []byte) Block  {
+func Deserialization(data []byte) Block {
 
 	decoder := gob.NewDecoder(bytes.NewReader(data))
 
