@@ -2,6 +2,7 @@ package blockChain
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/binary"
 	"encoding/gob"
 	"log"
@@ -56,8 +57,17 @@ func NewBlock(txs []*Transaction, prevHash []byte) *Block {
 }
 
 func (block *Block) MakeMerkelRoot() []byte {
-	//TODO
-	return []byte{}
+
+	var info []byte
+
+	txs := block.Transactions
+	for _, tx := range txs {
+		info = append(info, tx.TXID...)
+	}
+
+	merkelRoot := sha256.Sum256(info)
+
+	return merkelRoot[:]
 }
 
 //uint64转[]byte
