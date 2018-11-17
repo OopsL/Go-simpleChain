@@ -62,8 +62,8 @@ func (cli *CLI) SendTraction(from, to string, amount float64, miner, data string
 }
 
 func (cli *CLI) NewWallet() {
-	wallet := blockChain.NewWallet()
-	fmt.Println("private : ", wallet.PrivateKey)
-	fmt.Println("pubkey : ", wallet.PublicKey)
+	wallets := blockChain.NewWallets()
+	address := wallets.CreateWallet()
+	fmt.Println("address : ", address)
 
 }
