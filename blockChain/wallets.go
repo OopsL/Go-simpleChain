@@ -6,7 +6,10 @@ import (
 	"encoding/gob"
 	"io/ioutil"
 	"log"
+	"os"
 )
+
+const walletsFileName = "wallets.dat"
 
 type Wallets struct {
 	WalletsMap map[string]*Wallet
@@ -20,13 +23,13 @@ func NewWallets() *Wallets {
 	return &wallets
 }
 
-func (wallets *Wallets) CreateWallet() string {
+func (ws *Wallets) CreateWallet() string {
 
 	wallet := NewWallet()
 	address := wallet.NewAddress()
 
-	wallets.WalletsMap[address] = wallet
-	wallets.SaveToFile()
+	ws.WalletsMap[address] = wallet
+	ws.SaveToFile()
 
 	return address
 }
@@ -41,15 +44,23 @@ func (ws *Wallets) SaveToFile() {
 		log.Panic(err)
 	}
 
-	ioutil.WriteFile("wallets.dat", buffer.Bytes(), 0600)
+	ioutil.WriteFile(walletsFileName, buffer.Bytes(), 0600)
 
 }
 
 func (ws *Wallets) LoadFile() {
-	content, err := ioutil.ReadFile("wallets.dat")
-	if err != nil {
-		//log.Panic(err)
+
+	_, err := os.Stat(walletsFileName)
+	if os.IsNotExist(err) {
+		//err:  stat wallets.dat: no such file or directory
+		//fmt.Println(walletsFileName, " not exists err : ", err )
 		return
+	}
+
+	content, err := ioutil.ReadFile(walletsFileName)
+	if err != nil {
+		log.Panic(err)
+		//return
 	}
 
 	gob.Register(elliptic.P256())
@@ -61,4 +72,14 @@ func (ws *Wallets) LoadFile() {
 	}
 
 	ws.WalletsMap = wsLocal.WalletsMap
+}
+
+//获取所有地址
+func (ws *Wallets) ListAllAddress() []string {
+	var addresses []string
+	for address := range ws.WalletsMap {
+		addresses = append(addresses, address)
+	}
+
+	return addresses
 }

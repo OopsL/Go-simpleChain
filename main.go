@@ -1,6 +1,8 @@
 package main
 
-import "simpleChain/blockChain"
+import (
+	"simpleChain/blockChain"
+)
 
 func main() {
 

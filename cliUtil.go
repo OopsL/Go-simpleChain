@@ -10,13 +10,15 @@ const Usage = `
 	printChain               "print all blockchain data" 
 	getBalance --address address
 	send from to amount miner data
+	newWallet "创建一个钱包实例"
+	"listAllAddress" "遍历所有地址"
 `
 
 func (cli *CLI) Run() {
 
 	args := os.Args
 	if len(args) < 2 {
-		fmt.Println("111" + Usage)
+		fmt.Println(Usage)
 		return
 	}
 
@@ -42,6 +44,9 @@ func (cli *CLI) Run() {
 
 	case "newWallet":
 		cli.NewWallet()
+
+	case "listAllAddress":
+		cli.ListAllAddress()
 
 	default:
 		fmt.Printf("无效的命令，请检查!\n")

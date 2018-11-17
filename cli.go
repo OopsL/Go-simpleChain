@@ -67,3 +67,11 @@ func (cli *CLI) NewWallet() {
 	fmt.Println("address : ", address)
 
 }
+
+func (cli *CLI) ListAllAddress() {
+	ws := blockChain.NewWallets()
+	addresses := ws.ListAllAddress()
+	for _, address := range addresses {
+		fmt.Println(address)
+	}
+}
