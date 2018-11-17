@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3c40f57d-fb49-4a05-8a50-d0a9e62fe447" name="Default Changelist" comment="">
+    <list default="true" id="3c40f57d-fb49-4a05-8a50-d0a9e62fe447" name="Default Changelist" comment="IsCoinbase">
+      <change afterPath="$PROJECT_DIR$/blockChain/transaction.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/run" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/run.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockChain/block.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockChain/block.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockChain/blockChain.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockChain/blockChain.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockChain/pow.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockChain/pow.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain.db" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cli.go" beforeDir="false" afterPath="$PROJECT_DIR$/cli.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cliUtil.go" beforeDir="false" afterPath="$PROJECT_DIR$/cliUtil.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -42,15 +38,15 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="go" value="6350" />
+          <entry key="go" value="6375" />
           <entry key="sh" value="1" />
-          <entry key="txt" value="7" />
+          <entry key="txt" value="82" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Go" value="6350" />
-          <entry key="PLAIN_TEXT" value="8" />
+          <entry key="Go" value="6375" />
+          <entry key="PLAIN_TEXT" value="83" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages">
@@ -80,8 +76,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/blockChain/block.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="32" column="5" selection-start-line="32" selection-start-column="5" selection-end-line="32" selection-end-column="5" />
+            <state relative-caret-position="146">
+              <caret line="31" column="5" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
               <folding>
                 <element signature="e#20#106#0" expanded="true" />
               </folding>
@@ -114,7 +110,7 @@
         <entry file="file://$PROJECT_DIR$/cliUtil.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="374">
-              <caret line="38" column="25" selection-start-line="38" selection-start-column="25" selection-end-line="38" selection-end-column="25" />
+              <caret line="37" column="25" selection-start-line="37" selection-start-column="25" selection-end-line="37" selection-end-column="25" />
               <folding>
                 <element signature="e#14#37#0" expanded="true" />
               </folding>
@@ -137,8 +133,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cli.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="503">
-              <caret line="49" column="41" selection-start-line="49" selection-start-column="41" selection-end-line="49" selection-end-column="41" />
+            <state relative-caret-position="484">
+              <caret line="48" column="41" selection-start-line="48" selection-start-column="41" selection-end-line="48" selection-end-column="41" />
             </state>
           </provider>
         </entry>
@@ -146,8 +142,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/blockChain/transaction.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="54">
-              <caret line="38" column="5" lean-forward="true" selection-start-line="38" selection-start-column="5" selection-end-line="38" selection-end-column="5" />
+            <state relative-caret-position="343">
+              <caret line="57" column="1" lean-forward="true" selection-start-line="57" selection-start-column="1" selection-end-line="57" selection-end-column="1" />
             </state>
           </provider>
         </entry>
@@ -314,7 +310,9 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add pow" />
-    <option name="LAST_COMMIT_MESSAGE" value="add pow" />
+    <MESSAGE value="1. blockchain实现getBalance&#10;2. transaction实现NewTransaction" />
+    <MESSAGE value="IsCoinbase" />
+    <option name="LAST_COMMIT_MESSAGE" value="IsCoinbase" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file:///usr/local/go/src/math/big/int.go">
@@ -404,8 +402,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/blockChain/block.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="32" column="5" selection-start-line="32" selection-start-column="5" selection-end-line="32" selection-end-column="5" />
+        <state relative-caret-position="146">
+          <caret line="31" column="5" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
           <folding>
             <element signature="e#20#106#0" expanded="true" />
           </folding>
@@ -415,7 +413,7 @@
     <entry file="file://$PROJECT_DIR$/cliUtil.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
-          <caret line="38" column="25" selection-start-line="38" selection-start-column="25" selection-end-line="38" selection-end-column="25" />
+          <caret line="37" column="25" selection-start-line="37" selection-start-column="25" selection-end-line="37" selection-end-column="25" />
           <folding>
             <element signature="e#14#37#0" expanded="true" />
           </folding>
@@ -424,8 +422,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cli.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="503">
-          <caret line="49" column="41" selection-start-line="49" selection-start-column="41" selection-end-line="49" selection-end-column="41" />
+        <state relative-caret-position="484">
+          <caret line="48" column="41" selection-start-line="48" selection-start-column="41" selection-end-line="48" selection-end-column="41" />
         </state>
       </provider>
     </entry>
@@ -448,8 +446,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/blockChain/transaction.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="38" column="5" lean-forward="true" selection-start-line="38" selection-start-column="5" selection-end-line="38" selection-end-column="5" />
+        <state relative-caret-position="343">
+          <caret line="57" column="1" lean-forward="true" selection-start-line="57" selection-start-column="1" selection-end-line="57" selection-end-column="1" />
         </state>
       </provider>
     </entry>
