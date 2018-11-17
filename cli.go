@@ -1,9 +1,8 @@
 package main
 
 import (
-	"simpleChain/blockChain"
-
 	"fmt"
+	"simpleChain/blockChain"
 )
 
 type CLI struct {
@@ -47,4 +46,16 @@ func (cli *CLI) getBalance(address string) {
 	}
 
 	fmt.Println(address, " 的余额为: ", total)
+}
+
+func (cli *CLI) SendTraction(from, to string, amount float64, miner, data string) {
+
+	coinbase := blockChain.NewCoinbaseTX(miner, data)
+	tx := blockChain.NewTransaction(from, to, amount, cli.bc)
+	if tx == nil {
+		fmt.Println("无效的交易")
+		return
+	}
+	cli.AddBlock([]*blockChain.Transaction{coinbase, tx})
+
 }
