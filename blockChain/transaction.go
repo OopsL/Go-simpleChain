@@ -22,13 +22,35 @@ type TXInput struct {
 	//引用output的索引值
 	Index int64
 	//解锁脚本
-	Sig string
+	//Sig string
+
+	//签名
+	Signature []byte
+
+	//公钥
+	PubKey []byte
 }
 
 type TXOutput struct {
 	Value float64
 	//锁定脚本
-	PubkeyHash string
+	//PubkeyHash string
+	//接收人公钥的hash
+	PubKeyHash []byte
+}
+
+//构建新的output
+// 1. 当前存储的是address, 根据address生成接收人的pubkeyHash
+func (output *TXOutput) Lock(address string) {
+
+	output.PubKeyHash = GetPubKeyFromAddress(address)
+}
+
+func NewTXOutput(amount float64, address string) *TXOutput {
+	output := TXOutput{Value: amount}
+	output.Lock(address)
+
+	return &output
 }
 
 //设置交易ID
@@ -48,9 +70,12 @@ func (tx *Transaction) SetHash() {
 //coinbase
 func NewCoinbaseTX(address string, data string) *Transaction {
 
-	input := TXInput{[]byte{}, -1, data}
-	output := TXOutput{reward, address}
-	tx := Transaction{[]byte{}, []TXInput{input}, []TXOutput{output}}
+	//挖矿交易 不需要填真实的pubkey
+	//TODO signature
+	input := TXInput{[]byte{}, -1, nil, []byte(data)}
+	//output := TXOutput{reward, address}
+	output := NewTXOutput(reward, address)
+	tx := Transaction{[]byte{}, []TXInput{input}, []TXOutput{*output}}
 	tx.SetHash()
 
 	return &tx
@@ -69,7 +94,21 @@ func (tx *Transaction) IsCoinbase() bool {
 
 func NewTransaction(from, to string, amount float64, bc *BlockChain) *Transaction {
 
-	utxos, resVal := bc.FindNeedUTXOs(from, amount)
+	//根据address获取钱包中的私钥和公钥
+	ws := NewWallets()
+	wallet := ws.WalletsMap[from]
+	if wallet == nil {
+		fmt.Println("获取钱包失败")
+		return nil
+	}
+
+	//privateKey := wallet.PrivateKey
+	pubKey := wallet.PublicKey
+
+	//需要传入pubkeyHash
+	//utxos, resVal := bc.FindNeedUTXOs(from, amount)
+	pubKeyHash := HashPubKey(pubKey)
+	utxos, resVal := bc.FindNeedUTXOs(pubKeyHash, amount)
 
 	if resVal < amount {
 		fmt.Println("余额不足, 请充值~")
@@ -81,17 +120,20 @@ func NewTransaction(from, to string, amount float64, bc *BlockChain) *Transactio
 	//创建交易
 	for keyID, indexArr := range utxos {
 		for _, val := range indexArr {
-			input := TXInput{[]byte(keyID), int64(val), from}
+			//TODO
+			input := TXInput{[]byte(keyID), int64(val), nil, pubKey}
 			inputs = append(inputs, input)
 		}
 	}
 
 	//创建output
-	output := TXOutput{amount, to}
-	outputs = append(outputs, output)
+	//output := TXOutput{amount, to}
+	output := NewTXOutput(amount, to)
+	outputs = append(outputs, *output)
 
 	if resVal > amount {
-		outputs = append(outputs, TXOutput{resVal - amount, from})
+		outputSel := NewTXOutput(resVal-amount, from)
+		outputs = append(outputs, *outputSel)
 	}
 
 	tx := Transaction{[]byte{}, inputs, outputs}

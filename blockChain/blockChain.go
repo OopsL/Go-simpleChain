@@ -1,6 +1,7 @@
 package blockChain
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/boltdb/bolt"
 	"log"
@@ -94,16 +95,16 @@ func (bc *BlockChain) AddBlock(txs []*Transaction) {
 }
 
 //查询未被消耗的所有的utxo
-func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
+func (bc *BlockChain) FindUTXOs(pubKeyHash []byte) []TXOutput {
 
 	var UTXO []TXOutput
 
-	txs := bc.FindUTXOTransantions(address)
+	txs := bc.FindUTXOTransantions(pubKeyHash)
 
 	for _, tx := range txs {
 		for _, output := range tx.TXOutputs {
 			//将未消耗的output添加进UTXO
-			if output.PubkeyHash == address {
+			if bytes.Equal(output.PubKeyHash, pubKeyHash) {
 				UTXO = append(UTXO, output)
 			}
 		}
@@ -114,18 +115,18 @@ func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
 
 //查找未被消耗的并且满足交易额度的utxo
 
-func (bc *BlockChain) FindNeedUTXOs(from string, amount float64) (map[string][]int64, float64) {
+func (bc *BlockChain) FindNeedUTXOs(senderPubKHash []byte, amount float64) (map[string][]int64, float64) {
 
 	utxos := make(map[string][]int64)
 	var calc float64
 
-	txs := bc.FindUTXOTransantions(from)
+	txs := bc.FindUTXOTransantions(senderPubKHash)
 
 	for _, tx := range txs {
 		for i, output := range tx.TXOutputs {
 
 			//将未消耗的output添加进UTXO
-			if output.PubkeyHash == from {
+			if bytes.Equal(output.PubKeyHash, senderPubKHash) {
 
 				if calc < amount {
 					//添加utxo
@@ -146,7 +147,7 @@ func (bc *BlockChain) FindNeedUTXOs(from string, amount float64) (map[string][]i
 }
 
 //提取代码
-func (bc *BlockChain) FindUTXOTransantions(address string) []*Transaction {
+func (bc *BlockChain) FindUTXOTransantions(sendPubKHash []byte) []*Transaction {
 
 	spentOutput := make(map[string][]int64)
 	var txs []*Transaction
@@ -173,7 +174,7 @@ func (bc *BlockChain) FindUTXOTransantions(address string) []*Transaction {
 				}
 
 				//将未消耗的output添加进UTXO
-				if output.PubkeyHash == address {
+				if bytes.Equal(output.PubKeyHash, sendPubKHash) {
 					//UTXO = append(UTXO, output)
 
 					txs = append(txs, tx)
@@ -189,7 +190,8 @@ func (bc *BlockChain) FindUTXOTransantions(address string) []*Transaction {
 					//先取出之前的值
 					//spentIndexArr := spentOutput[string(input.TXID)]
 					//将当前值存入
-					if input.Sig == address {
+					tmpHash := HashPubKey(input.PubKey)
+					if bytes.Equal(tmpHash, sendPubKHash) {
 						spentOutput[string(input.TXID)] = append(spentOutput[string(input.TXID)], input.Index)
 
 					}
