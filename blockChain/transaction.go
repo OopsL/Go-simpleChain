@@ -8,6 +8,8 @@ import (
 	"log"
 )
 
+const reward = 50.0
+
 //交易
 type Transaction struct {
 	TXID      []byte     //交易ID
@@ -42,8 +44,6 @@ func (tx *Transaction) SetHash() {
 	hash := sha256.Sum256(data)
 	tx.TXID = hash[:]
 }
-
-const reward = 12.5
 
 //coinbase
 func NewCoinbaseTX(address string, data string) *Transaction {

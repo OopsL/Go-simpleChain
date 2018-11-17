@@ -4,7 +4,7 @@ import "simpleChain/blockChain"
 
 func main() {
 
-	bc := blockChain.NewBlockChain("中本聪")
+	bc := blockChain.NewBlockChain("张三")
 
 	cli := CLI{bc: bc}
 	cli.Run()
