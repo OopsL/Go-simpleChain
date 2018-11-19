@@ -3,7 +3,6 @@ package blockChain
 import (
 	"bytes"
 	"crypto/sha256"
-	"fmt"
 	"math/big"
 )
 
@@ -53,7 +52,7 @@ func (pow *ProofOfWork) RunPow() ([]byte, uint64) {
 		tmpInt.SetBytes(blockHash[:])
 
 		if tmpInt.Cmp(pow.target) == -1 {
-			fmt.Printf("挖矿成功！hash : %x, nonce : %d\n", blockHash, nonce)
+			//fmt.Printf("挖矿成功！hash : %x, nonce : %d\n", blockHash, nonce)
 			break
 		} else {
 			nonce++
