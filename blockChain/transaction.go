@@ -2,6 +2,8 @@ package blockChain
 
 import (
 	"bytes"
+	"crypto/ecdsa"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/gob"
 	"fmt"
@@ -102,7 +104,7 @@ func NewTransaction(from, to string, amount float64, bc *BlockChain) *Transactio
 		return nil
 	}
 
-	//privateKey := wallet.PrivateKey
+	privateKey := wallet.PrivateKey
 	pubKey := wallet.PublicKey
 
 	//需要传入pubkeyHash
@@ -139,5 +141,58 @@ func NewTransaction(from, to string, amount float64, bc *BlockChain) *Transactio
 	tx := Transaction{[]byte{}, inputs, outputs}
 	tx.SetHash()
 
+	//签名
+	bc.SignTransaction(&tx, privateKey)
+
 	return &tx
+}
+
+func (tx *Transaction) Sign(privateKey *ecdsa.PrivateKey, prevTXs map[string]Transaction) {
+	//TODO
+
+	txCopy := tx.TrimmedCopy()
+
+	//遍历copy的tx
+	for i, input := range txCopy.TXInputs {
+		//根据input的TXID找到prevTXs中对应的tx
+		prevTx := prevTXs[string(input.TXID)]
+
+		if len(prevTx.TXID) == 0 {
+			log.Panic("无效的交易")
+		}
+
+		//对input的Pubkey进行赋值
+		txCopy.TXInputs[i].PubKey = prevTx.TXOutputs[i].PubKeyHash
+
+		//对txCopy进行hash运算
+		txCopy.SetHash()
+		//还原, 以免影响后面的input的签名
+		txCopy.TXInputs[i].PubKey = nil
+		//签名是对交易的hash进行签名 本例中交易的TXID的值是交易的hash值
+		signDataHash := txCopy.TXID
+		//签名
+		r, s, err := ecdsa.Sign(rand.Reader, privateKey, signDataHash)
+		if err != nil {
+			log.Panic("签名错误", err)
+		}
+
+		//给原tx的input的signature赋值
+		tx.TXInputs[i].Signature = append(r.Bytes(), s.Bytes()...)
+
+	}
+
+}
+
+func (tx *Transaction) TrimmedCopy() Transaction {
+	var inputs []TXInput
+	var outputs []TXOutput
+
+	for _, input := range tx.TXInputs {
+		inputs = append(inputs, TXInput{input.TXID, input.Index, nil, nil})
+	}
+	for _, output := range tx.TXOutputs {
+		outputs = append(outputs, output)
+	}
+
+	return Transaction{tx.TXID, inputs, outputs}
 }

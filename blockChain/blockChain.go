@@ -2,6 +2,8 @@ package blockChain
 
 import (
 	"bytes"
+	"crypto/ecdsa"
+	"errors"
 	"fmt"
 	"github.com/boltdb/bolt"
 	"log"
@@ -208,4 +210,39 @@ func (bc *BlockChain) FindUTXOTransantions(sendPubKHash []byte) []*Transaction {
 	}
 
 	return txs
+}
+
+func (bc *BlockChain) FindTransactionByTXID(txid []byte) (Transaction, error) {
+
+	iter := bc.NewIterator()
+	//1. 遍历block
+	for {
+		block := iter.Next()
+
+		//2. 遍历txs
+		for _, tx := range block.Transactions {
+			if bytes.Equal(tx.TXID, txid) {
+				return *tx, nil
+			}
+		}
+
+		if block.PrevHash == nil {
+			break
+		}
+	}
+	return Transaction{}, errors.New("无效的id")
+}
+
+func (bc *BlockChain) SignTransaction(tx *Transaction, key *ecdsa.PrivateKey) {
+
+	prevTXs := make(map[string]Transaction)
+	//遍历新的tx, 找出对应input对应的tx
+	for _, input := range tx.TXInputs {
+		resTX, err := bc.FindTransactionByTXID(input.TXID)
+		if err != nil {
+			log.Panic(err)
+		}
+		prevTXs[string(input.TXID)] = resTX
+	}
+	tx.Sign(key, prevTXs)
 }
