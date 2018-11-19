@@ -148,7 +148,6 @@ func NewTransaction(from, to string, amount float64, bc *BlockChain) *Transactio
 }
 
 func (tx *Transaction) Sign(privateKey *ecdsa.PrivateKey, prevTXs map[string]Transaction) {
-	//TODO
 
 	txCopy := tx.TrimmedCopy()
 
