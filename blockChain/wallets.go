@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/elliptic"
 	"encoding/gob"
-	"fmt"
 	"github.com/btcsuite/btcutil/base58"
 	"io/ioutil"
 	"log"
@@ -90,7 +89,7 @@ func GetPubKeyFromAddress(address string) []byte {
 	base58De := base58.Decode(address)
 	//base58De由 1byte version + 20byte pubkeyhash + 4byte checkcode组成
 	//截取pubkeyhash
-	fmt.Println("len = ", len(base58De), "address = ", address)
+	//fmt.Println("len = ", len(base58De), "address = ", address)
 	pubkeyHash := base58De[1 : len(base58De)-4]
 	return pubkeyHash
 }

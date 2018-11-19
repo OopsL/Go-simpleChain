@@ -74,6 +74,14 @@ func (bc *BlockChain) AddBlock(txs []*Transaction) {
 	//newBlock := NewBlock(data, lastBlock.Hash)
 	//bc.Blocks = append(bc.Blocks, newBlock)
 
+	//校验交易
+	for _, tx := range txs {
+		if !bc.VerifyTransaction(tx) {
+			fmt.Println("add block tx verify err")
+			return
+		}
+	}
+
 	db := bc.DB
 	if db == nil {
 		log.Panic("addblock db is nil")
@@ -203,8 +211,8 @@ func (bc *BlockChain) FindUTXOTransantions(sendPubKHash []byte) []*Transaction {
 			}
 		}
 
-		if block.PrevHash == nil {
-			fmt.Println("FindUTXOs 区块遍历完成")
+		if len(block.PrevHash) == 0 {
+			//fmt.Println("FindUTXOs 区块遍历完成")
 			break
 		}
 	}
@@ -226,7 +234,7 @@ func (bc *BlockChain) FindTransactionByTXID(txid []byte) (Transaction, error) {
 			}
 		}
 
-		if block.PrevHash == nil {
+		if len(block.PrevHash) == 0 {
 			break
 		}
 	}
@@ -245,4 +253,28 @@ func (bc *BlockChain) SignTransaction(tx *Transaction, key *ecdsa.PrivateKey) {
 		prevTXs[string(input.TXID)] = resTX
 	}
 	tx.Sign(key, prevTXs)
+}
+
+func (bc *BlockChain) VerifyTransaction(tx *Transaction) bool {
+
+	if tx.IsCoinbase() {
+		//fmt.Println("coinbase")
+		return true
+	}
+
+	prevTXs := make(map[string]Transaction)
+	//遍历新的tx, 找出对应input对应的tx
+	for _, input := range tx.TXInputs {
+		//根据id查找交易本身，需要遍历整个区块链
+		tx, err := bc.FindTransactionByTXID(input.TXID)
+
+		if err != nil {
+			log.Panic(err)
+		}
+
+		prevTXs[string(input.TXID)] = tx
+
+	}
+
+	return tx.Verify(prevTXs)
 }

@@ -3,11 +3,13 @@ package blockChain
 import (
 	"bytes"
 	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/gob"
 	"fmt"
 	"log"
+	"math/big"
 )
 
 const reward = 50.0
@@ -73,7 +75,6 @@ func (tx *Transaction) SetHash() {
 func NewCoinbaseTX(address string, data string) *Transaction {
 
 	//挖矿交易 不需要填真实的pubkey
-	//TODO signature
 	input := TXInput{[]byte{}, -1, nil, []byte(data)}
 	//output := TXOutput{reward, address}
 	output := NewTXOutput(reward, address)
@@ -122,7 +123,6 @@ func NewTransaction(from, to string, amount float64, bc *BlockChain) *Transactio
 	//创建交易
 	for keyID, indexArr := range utxos {
 		for _, val := range indexArr {
-			//TODO
 			input := TXInput{[]byte(keyID), int64(val), nil, pubKey}
 			inputs = append(inputs, input)
 		}
@@ -149,6 +149,10 @@ func NewTransaction(from, to string, amount float64, bc *BlockChain) *Transactio
 
 func (tx *Transaction) Sign(privateKey *ecdsa.PrivateKey, prevTXs map[string]Transaction) {
 
+	if tx.IsCoinbase() {
+		return
+	}
+
 	txCopy := tx.TrimmedCopy()
 
 	//遍历copy的tx
@@ -161,7 +165,7 @@ func (tx *Transaction) Sign(privateKey *ecdsa.PrivateKey, prevTXs map[string]Tra
 		}
 
 		//对input的Pubkey进行赋值
-		txCopy.TXInputs[i].PubKey = prevTx.TXOutputs[i].PubKeyHash
+		txCopy.TXInputs[i].PubKey = prevTx.TXOutputs[input.Index].PubKeyHash
 
 		//对txCopy进行hash运算
 		txCopy.SetHash()
@@ -194,4 +198,49 @@ func (tx *Transaction) TrimmedCopy() Transaction {
 	}
 
 	return Transaction{tx.TXID, inputs, outputs}
+}
+
+//校验Transaction
+func (tx *Transaction) Verify(prevTXs map[string]Transaction) bool {
+
+	if tx.IsCoinbase() {
+		return true
+	}
+	txCopy := tx.TrimmedCopy()
+
+	for i, input := range tx.TXInputs {
+		prevTx := prevTXs[string(input.TXID)]
+		if len(prevTx.TXID) == 0 {
+			log.Panic("引用的交易无效")
+		}
+		//本地先生成tx的数据hash, 再校验
+		txCopy.TXInputs[i].PubKey = prevTx.TXOutputs[input.Index].PubKeyHash
+
+		txCopy.SetHash()
+		//交易的hash
+		dataHash := txCopy.TXID
+		//根据交易提供的签名和公钥 进行验证
+		signature := input.Signature
+		pubKey := input.PubKey
+
+		//根据signature, 分解出r, s
+		r := big.Int{}
+		s := big.Int{}
+
+		r.SetBytes(signature[:len(signature)/2])
+		s.SetBytes(signature[len(signature)/2:])
+
+		//根据pubkey分解出X Y后, 再生成公钥
+		X := big.Int{}
+		Y := big.Int{}
+
+		X.SetBytes(pubKey[:len(pubKey)/2])
+		Y.SetBytes(pubKey[len(pubKey)/2:])
+		pubKeyOrigin := ecdsa.PublicKey{elliptic.P256(), &X, &Y}
+
+		if !ecdsa.Verify(&pubKeyOrigin, dataHash, &r, &s) {
+			return false
+		}
+	}
+	return true
 }
